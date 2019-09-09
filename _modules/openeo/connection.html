@@ -1,0 +1,390 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>openeo.connection &#8212; openeo 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for openeo.connection</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">.auth</span> <span class="k">import</span> <span class="n">Auth</span>
+<span class="kn">from</span> <span class="nn">openeo.imagecollection</span> <span class="k">import</span> <span class="n">ImageCollection</span>
+<span class="n">from</span><span class="o">.</span><span class="n">capabilities</span> <span class="kn">import</span> <span class="nn">Capabilities</span>
+<span class="kn">from</span> <span class="nn">.job</span> <span class="k">import</span> <span class="n">Job</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Dict</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">openeo.sessions</span>
+<span class="sd">~~~~~~~~~~~~~~~~</span>
+<span class="sd">This module provides a Connection object to manage and persist settings when interacting with the OpenEO API.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="Connection"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection">[docs]</a><span class="k">class</span> <span class="nc">Connection</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A `Connection` class represents a connection with an OpenEO service.</span>
+<span class="sd">    It is your entry point to create new Image Collections.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">auth</span><span class="p">:</span><span class="n">Auth</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Authenticates a user to the backend using auth class.</span>
+
+<span class="sd">        :param username: String Username credential of the user</span>
+<span class="sd">        :param password: String Password credential of the user</span>
+<span class="sd">        :param auth_class: Auth instance of the abstract Auth class</span>
+
+<span class="sd">        :return: token: String Bearer token</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="Connection.capabilities"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.capabilities">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">capabilities</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Capabilities</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads all available capabilities.</span>
+
+<span class="sd">        :return: data_dict: Dict All available data types</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Connection.list_file_types"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.list_file_types">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">list_file_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads all available output formats.</span>
+<span class="sd">        :return: data_dict: Dict All available output formats</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Connection.list_service_types"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.list_service_types">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">list_service_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads all available service types.</span>
+<span class="sd">        :return: data_dict: Dict All available service types</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Connection.list_collections"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.list_collections">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">list_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve all collections available in the backend.</span>
+
+<span class="sd">        :return: a dict containing collection information. The &#39;product_id&#39; corresponds to an image collection id.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Connection.describe_collection"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.describe_collection">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">describe_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads detailed information of a specific image collection.</span>
+<span class="sd">        :param name: String Id of the collection</span>
+<span class="sd">        :return: data_dict: Dict Detailed information about the collection</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Connection.list_processes"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.list_processes">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">list_processes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads all available processes of the back end.</span>
+<span class="sd">        :return: processes_dict: Dict All available processes of the back end.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Connection.authenticate_OIDC"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.authenticate_OIDC">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">authenticate_OIDC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{})</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Authenticates a user to the backend using OIDC.</span>
+<span class="sd">        :param options: Authentication options</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Connection.authenticate_basic"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.authenticate_basic">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">authenticate_basic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Authenticates a user to the backend using HTTP Basic.</span>
+<span class="sd">        :param options: Authentication options</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Connection.describe_account"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.describe_account">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">describe_account</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Describes the currently authenticated user account.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Connection.list_files"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.list_files">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">list_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lists all files that the logged in user uploaded.</span>
+<span class="sd">        :param user_id: user id, which files should be listed.</span>
+<span class="sd">        :return: file_list: List of the user uploaded files.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Connection.create_file"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.create_file">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">create_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates virtual file</span>
+<span class="sd">        :param user_id: owner of the file.</span>
+<span class="sd">        :return: file object.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">validate_processgraph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process_graph</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">list_processgraphs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process_graph</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="Connection.execute"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.execute">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process_graph</span><span class="p">,</span> <span class="n">output_format</span><span class="p">,</span> <span class="n">output_parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">budget</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute a process graph synchronously.</span>
+<span class="sd">        :param process_graph: Dict representing a process graph</span>
+<span class="sd">        :param output_format: String Output format of the execution</span>
+<span class="sd">        :param output_parameters: Dict of additional output parameters</span>
+<span class="sd">        :param budget: Budget</span>
+<span class="sd">        :return: job_id: String</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Connection.list_jobs"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.list_jobs">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">list_jobs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lists all jobs of the authenticated user.</span>
+<span class="sd">        :return: job_list: Dict of all jobs of the user.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Connection.create_job"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.create_job">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">create_job</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process_graph</span><span class="p">:</span><span class="n">Dict</span><span class="p">,</span> <span class="n">output_format</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_parameters</span><span class="p">:</span><span class="n">Dict</span><span class="o">=</span><span class="p">{},</span>
+                   <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plan</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">budget</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">additional</span><span class="p">:</span><span class="n">Dict</span><span class="o">=</span><span class="p">{})</span> <span class="o">-&gt;</span> <span class="n">Job</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Posts a job to the back end.</span>
+
+<span class="sd">        :param process_graph: String data of the job (e.g. process graph)</span>
+<span class="sd">        :param output_format: String Output format of the execution</span>
+<span class="sd">        :param output_parameters: Dict of additional output parameters</span>
+<span class="sd">        :param title: String title of the job</span>
+<span class="sd">        :param description: String description of the job</span>
+<span class="sd">        :param budget: Budget</span>
+<span class="sd">        :return: job_id: Job object representing the job</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Connection.list_services"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.list_services">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">list_services</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads all available services of the authenticated user.</span>
+<span class="sd">        :return: data_dict: Dict All available service types</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Connection.create_service"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.create_service">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">create_service</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a secondary web service such as WMTS, TMS or WCS. The underlying data is processes on-demand, but a process graph may simply access results from a batch job.</span>
+
+<span class="sd">        :param graph: Dict representing a process graph</span>
+<span class="sd">        :param type: The type of service, e.g. &#39;WMTS&#39;, &#39;TMS&#39; or &#39;WCS&#39;. A list of supported types can be queried from the backend.</span>
+<span class="sd">        :param title: A short description to easily distinguish entities.</span>
+<span class="sd">        :param description: Detailed description to fully explain the entity. CommonMark 0.28 syntax MAY be used for rich text representation.</span>
+<span class="sd">        :return: A dict containing service details.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Connection.remove_service"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.remove_service">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">remove_service</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stop and remove a secondary web service.</span>
+<span class="sd">        :param service_id: service identifier</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<span class="c1"># TODO: methods below are depricated / should be located somewhere else.</span>
+
+<div class="viewcode-block" id="Connection.get_process"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.get_process">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process_id</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="c1"># TODO: Maybe create some kind of Process class.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get detailed information about a specifig process.</span>
+
+<span class="sd">        :param process_id: String Process identifier</span>
+
+<span class="sd">        :return: processes_dict: Dict with the detail information about the</span>
+<span class="sd">                                 process</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Connection.imagecollection"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.imagecollection">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">imagecollection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_collection_id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImageCollection</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves an Image Collection object based on the id of a given layer.</span>
+<span class="sd">        A list of available collections can be retrieved with :meth:`openeo.connection.Connection.list_collections`.</span>
+
+<span class="sd">        :param image_collection_id: The id of the image collection to retrieve.</span>
+
+<span class="sd">        :rtype: openeo.imagecollection.ImageCollection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Connection.image"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.image">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_product_id</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get imagery by id.</span>
+<span class="sd">        DEPRECATED</span>
+
+<span class="sd">        :param image_collection_id: String image collection identifier</span>
+
+<span class="sd">        :return: collection: RestImagery the imagery with the id</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Connection.download"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.download">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">outputfile</span><span class="p">,</span> <span class="n">format_options</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Downloads a result of a process graph synchronously.</span>
+
+<span class="sd">        :param graph: Dict representing a process graph</span>
+<span class="sd">        :param outputfile: output file</span>
+<span class="sd">        :param format_options: formating options</span>
+
+<span class="sd">        :return: job_id: String</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Connection.get_outputformats"><a class="viewcode-back" href="../../index.html#openeo.connection.Connection.get_outputformats">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_outputformats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads all available output formats.</span>
+
+<span class="sd">        :return: data_dict: Dict All available output formats</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">openeo</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=Open-EO&repo=openeo-python-client&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+    
+
+<p>
+<a class="badge" href="https://travis-ci.org/Open-EO/openeo-python-client">
+    <img
+        alt="https://secure.travis-ci.org/Open-EO/openeo-python-client.svg?branch=master"
+        src="https://secure.travis-ci.org/Open-EO/openeo-python-client.svg?branch=master"
+    />
+</a>
+</p>
+
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><!-- Alabaster (krTheme++) Hacks -->
+
+<!-- CSS Adjustments from requests: https://github.com/kennethreitz/requests/blob/master/docs/_templates/hacks.html-->
+<style type="text/css">
+  /* Rezzy requires precise alignment. */
+  img.logo {margin-left: -20px!important;}
+  /* "Quick Search" should be capitalized. */
+  div#searchbox h3 {text-transform: capitalize;}
+  /* Make the document a little wider, less code is cut-off. */
+  div.document {width: 1008px;}
+  /* Much-improved spacing around code blocks. */
+  div.highlight pre {padding: 11px 14px;}
+  /* Remain Responsive! */
+  @media screen and (max-width: 1008px) {
+    div.sphinxsidebar {display: none;}
+    div.document {width: 100%!important;}
+    /* Have code blocks escape the document right-margin. */
+    div.highlight pre {margin-right: -30px;}
+  }
+</style>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Jeroen Dries.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.7</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+    <a href="https://github.com/Open-EO/openeo-python-client" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,536 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>openeo.imagecollection &#8212; openeo 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for openeo.imagecollection</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABC</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">date</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">deprecated</span> <span class="k">import</span> <span class="n">deprecated</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">MultiPolygon</span>
+
+<span class="kn">from</span> <span class="nn">openeo.job</span> <span class="k">import</span> <span class="n">Job</span>
+<span class="kn">from</span> <span class="nn">openeo.util</span> <span class="k">import</span> <span class="n">get_temporal_extent</span><span class="p">,</span> <span class="n">first_not_none</span>
+
+
+<div class="viewcode-block" id="ImageCollection"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection">[docs]</a><span class="k">class</span> <span class="nc">ImageCollection</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class representing Processes. &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="ImageCollection.date_range_filter"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.date_range_filter">[docs]</a>    <span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;Use `filter_temporal()` instead&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">date_range_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_date</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">datetime</span><span class="p">,</span><span class="n">date</span><span class="p">],</span><span class="n">end_date</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">datetime</span><span class="p">,</span><span class="n">date</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Specifies a date range filter to be applied on the ImageCollection</span>
+<span class="sd">        DEPRECATED: use :func:`openeo.ImageCollection.filter_temporal`</span>
+
+<span class="sd">        :param start_date: Start date of the filter, inclusive, format: &quot;YYYY-MM-DD&quot;.</span>
+<span class="sd">        :param end_date: End date of the filter, exclusive, format e.g.: &quot;2018-01-13&quot;.</span>
+<span class="sd">        :return: An ImageCollection filtered by date.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_temporal</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="n">end_date</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageCollection.filter_daterange"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.filter_daterange">[docs]</a>    <span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;Use `filter_temporal()` instead&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">filter_daterange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Drops observations from a collection that have been captured before</span>
+<span class="sd">            a start or after a given end date.</span>
+
+<span class="sd">            :param extent: List of starting date and ending date of the filter</span>
+<span class="sd">            :return: An ImageCollection filtered by date.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_temporal</span><span class="p">(</span><span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageCollection.filter_temporal"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.filter_temporal">[docs]</a>    <span class="k">def</span> <span class="nf">filter_temporal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                        <span class="n">start_date</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">end_date</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">extent</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Limit the ImageCollection to a certain date range, which can be specified in several ways:</span>
+
+<span class="sd">        &gt;&gt;&gt; im.filter_temporal(&quot;2019-07-01&quot;, &quot;2019-08-01&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; im.filter_temporal([&quot;2019-07-01&quot;, &quot;2019-08-01&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; im.filter_temporal(extent=[&quot;2019-07-01&quot;, &quot;2019-08-01&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; im.filter_temporal(start_date=&quot;2019-07-01&quot;, end_date=&quot;2019-08-01&quot;])</span>
+
+<span class="sd">        :param start_date: start date of the filter (inclusive), as a string or date object</span>
+<span class="sd">        :param end_date: end date of the filter (exclusive), as a string or date object</span>
+<span class="sd">        :param extent: two element list/tuple start and end date of the filter</span>
+<span class="sd">        :return: An ImageCollection filtered by date.</span>
+
+<span class="sd">        Subclasses are recommended to implement `_filter_temporal&#39;, which has simpler API.</span>
+
+<span class="sd">        https://open-eo.github.io/openeo-api/processreference/#filter_temporal</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">get_temporal_extent</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">start_date</span><span class="o">=</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="n">end_date</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_temporal</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_filter_temporal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="c1"># Subclasses are expected to implement this method, but for bit of backward compatibility</span>
+        <span class="c1"># with old style subclasses we forward to `date_range_filter`</span>
+        <span class="c1"># TODO: replace this with raise NotImplementedError() or decorate with @abstractmethod</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_range_filter</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ImageCollection.filter_bbox"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.filter_bbox">[docs]</a>    <span class="k">def</span> <span class="nf">filter_bbox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">west</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Limits the ImageCollection to a given spatial bounding box.</span>
+
+<span class="sd">        :param west: west boundary (longitude / easting)</span>
+<span class="sd">        :param east: east boundary (longitude / easting)</span>
+<span class="sd">        :param north: north boundary (latitude / northing)</span>
+<span class="sd">        :param south: south boundary (latitude / northing)</span>
+<span class="sd">        :param crs: spatial reference system of boundaries as</span>
+<span class="sd">                    proj4 or EPSG:12345 like string</span>
+<span class="sd">        :param base: lower left corner coordinate axis 3</span>
+<span class="sd">        :param height: upper right corner coordinate axis 3</span>
+<span class="sd">        :return: An image collection cropped to the specified bounding box.</span>
+
+<span class="sd">        https://open-eo.github.io/openeo-api/v/0.4.1/processreference/#filter_bbox</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Subclasses are expected to implement this method, but for bit of backwards compatibility</span>
+        <span class="c1"># with old style subclasses we forward to `bbox_filter`</span>
+        <span class="c1"># TODO: replace this with raise NotImplementedError() or decorate with @abstractmethod</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">west</span><span class="o">=</span><span class="n">west</span><span class="p">,</span> <span class="n">east</span><span class="o">=</span><span class="n">east</span><span class="p">,</span> <span class="n">north</span><span class="o">=</span><span class="n">north</span><span class="p">,</span> <span class="n">south</span><span class="o">=</span><span class="n">south</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">base</span> <span class="ow">or</span> <span class="n">height</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base</span><span class="o">=</span><span class="n">base</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bbox_filter</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageCollection.bbox_filter"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.bbox_filter">[docs]</a>    <span class="nd">@deprecated</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Use `filter_bbox()` instead.&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">bbox_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">west</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">east</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">north</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">south</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">left</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">srs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Specifies a bounding box to filter input image collections.</span>
+<span class="sd">        DEPRECATED: use :func:`openeo.ImageCollection.filter_bbox`</span>
+
+<span class="sd">        :param left:</span>
+<span class="sd">        :param right:</span>
+<span class="sd">        :param top:</span>
+<span class="sd">        :param bottom:</span>
+<span class="sd">        :param srs:</span>
+<span class="sd">        :return: An image collection cropped to the specified bounding box.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_bbox</span><span class="p">(</span>
+            <span class="n">west</span><span class="o">=</span><span class="n">first_not_none</span><span class="p">(</span><span class="n">west</span><span class="p">,</span> <span class="n">left</span><span class="p">),</span> <span class="n">east</span><span class="o">=</span><span class="n">first_not_none</span><span class="p">(</span><span class="n">east</span><span class="p">,</span> <span class="n">right</span><span class="p">),</span>
+            <span class="n">north</span><span class="o">=</span><span class="n">first_not_none</span><span class="p">(</span><span class="n">north</span><span class="p">,</span> <span class="n">top</span><span class="p">),</span> <span class="n">south</span><span class="o">=</span><span class="n">first_not_none</span><span class="p">(</span><span class="n">south</span><span class="p">,</span> <span class="n">bottom</span><span class="p">),</span>
+            <span class="n">base</span><span class="o">=</span><span class="n">base</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+            <span class="n">crs</span><span class="o">=</span><span class="n">first_not_none</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">srs</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageCollection.apply"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">process</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">arguments</span> <span class="o">=</span> <span class="p">{})</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies a unary process (a local operation) to each value of the specified or all dimensions in the data cube.</span>
+<span class="sd">        https://open-eo.github.io/openeo-api/v/0.4.0/processreference/#apply</span>
+
+<span class="sd">        :param process: A process (callback) to be applied on each value. The specified process must be unary meaning that it must work on a single value.</span>
+<span class="sd">        :param dimensions: The names of the dimensions to apply the process on. Defaults to an empty array so that all dimensions are used.</span>
+<span class="sd">        :return: A data cube with the newly computed values. The resolution, cardinality and the number of dimensions are the same as for the original data cube.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Apply function not supported by this data cube.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageCollection.apply_pixel"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.apply_pixel">[docs]</a>    <span class="k">def</span> <span class="nf">apply_pixel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bands</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">bandfunction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Apply a function to the given set of bands in this image collection.</span>
+
+<span class="sd">        This type applies a simple function to one pixel of the input image or image collection.</span>
+<span class="sd">        The function gets the value of one pixel (including all bands) as input and produces a single scalar or tuple output.</span>
+<span class="sd">        The result has the same schema as the input image (collection) but different bands.</span>
+<span class="sd">        Examples include the computation of vegetation indexes or filtering cloudy pixels.</span>
+
+<span class="sd">        :param imagecollection: Imagecollection to apply the process, Instance of ImageCollection</span>
+<span class="sd">        :param bands: Bands to be used</span>
+<span class="sd">        :param bandfunction: Band function to be used</span>
+
+<span class="sd">        :return: An image collection with the pixel applied function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.apply_tiles"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.apply_tiles">[docs]</a>    <span class="k">def</span> <span class="nf">apply_tiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Apply a function to the tiles of an image collection.</span>
+
+<span class="sd">        This type applies a simple function to one pixel of the input image or image collection.</span>
+<span class="sd">        The function gets the value of one pixel (including all bands) as input and produces a single scalar or tuple output.</span>
+<span class="sd">        The result has the same schema as the input image (collection) but different bands.</span>
+<span class="sd">        Examples include the computation of vegetation indexes or filtering cloudy pixels.</span>
+
+<span class="sd">        :param code: Code to apply to the ImageCollection</span>
+
+<span class="sd">        :return: An image collection with the tiles applied function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.aggregate_time"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.aggregate_time">[docs]</a>    <span class="k">def</span> <span class="nf">aggregate_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temporal_window</span><span class="p">,</span> <span class="n">aggregationfunction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Applies a windowed reduction to a timeseries by applying a user defined function.</span>
+<span class="sd">            DEPRECATED: use Aggregate_temporal</span>
+
+<span class="sd">            :param temporal_window: The time windows to group by, can be a list of halfopen intervals</span>
+<span class="sd">            :param aggregationfunction: The function to apply to each time window. Takes a pandas Timeseries as input.</span>
+
+<span class="sd">            :return: An ImageCollection containing  a result for each time window</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.aggregate_temporal"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.aggregate_temporal">[docs]</a>    <span class="k">def</span> <span class="nf">aggregate_temporal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intervals</span><span class="p">:</span><span class="n">List</span><span class="p">,</span><span class="n">labels</span><span class="p">:</span><span class="n">List</span><span class="p">,</span> <span class="n">reducer</span><span class="p">,</span> <span class="n">dimension</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Computes a temporal aggregation based on an array of date and/or time intervals.</span>
+
+<span class="sd">            Calendar hierarchies such as year, month, week etc. must be transformed into specific intervals by the clients. For each interval, all data along the dimension will be passed through the reducer. The computed values will be projected to the labels, so the number of labels and the number of intervals need to be equal.</span>
+
+<span class="sd">            If the dimension is not set, the data cube is expected to only have one temporal dimension.</span>
+
+<span class="sd">            :param intervals: Temporal left-closed intervals so that the start time is contained, but not the end time.</span>
+<span class="sd">            :param labels: Labels for the intervals. The number of labels and the number of groups need to be equal.</span>
+<span class="sd">            :param reducer: A reducer to be applied on all values along the specified dimension. The reducer must be a callable process (or a set processes) that accepts an array and computes a single return value of the same type as the input values, for example median.</span>
+<span class="sd">            :param dimension: The temporal dimension for aggregation. All data along the dimension will be passed through the specified reducer. If the dimension is not set, the data cube is expected to only have one temporal dimension.</span>
+
+<span class="sd">            :return: An ImageCollection containing  a result for each time window</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.reduce"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.reduce">[docs]</a>    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">reducer</span><span class="p">,</span><span class="n">dimension</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies a reducer to a data cube dimension by collapsing all the input values along the specified dimension into a single output value computed by the reducer.</span>
+
+<span class="sd">        The reducer must accept an array and return a single value (see parameter reducer). Nominal values are possible, but need to be mapped, e.g. band names to wavelengths, date strings to numeric timestamps since 1970 etc.</span>
+
+<span class="sd">        https://open-eo.github.io/openeo-api/v/0.4.0/processreference/#reduce</span>
+
+<span class="sd">        :param reducer: A reducer to be applied on the specified dimension. The reducer must be a callable process (or a set processes) that accepts an array and computes a single return value of the same type as the input values, for example median.</span>
+<span class="sd">        :param dimension: The dimension over which to reduce.</span>
+<span class="sd">        :return: A data cube with the newly computed values. The number of dimensions is reduced, but the resolution and cardinality are the same as for the original data cube.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This image collection does not support the reduce operation.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ImageCollection.reduce_time"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.reduce_time">[docs]</a>    <span class="k">def</span> <span class="nf">reduce_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aggregationfunction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Applies a windowed reduction to a timeseries by applying a user defined function.</span>
+
+<span class="sd">            :param aggregationfunction: The function to apply to each time window. Takes a pandas Timeseries as input.</span>
+
+<span class="sd">            :return: An ImageCollection without a time dimension</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.min_time"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.min_time">[docs]</a>    <span class="k">def</span> <span class="nf">min_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Finds the minimum value of time series for all bands of the input dataset.</span>
+
+<span class="sd">            :return: An ImageCollection without a time dimension.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.max_time"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.max_time">[docs]</a>    <span class="k">def</span> <span class="nf">max_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Finds the maximum value of time series for all bands of the input dataset.</span>
+
+<span class="sd">            :return: An ImageCollection without a time dimension.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.mean_time"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.mean_time">[docs]</a>    <span class="k">def</span> <span class="nf">mean_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Finds the mean value of time series for all bands of the input dataset.</span>
+
+<span class="sd">            :return: An ImageCollection without a time dimension.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.median_time"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.median_time">[docs]</a>    <span class="k">def</span> <span class="nf">median_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Finds the median value of time series for all bands of the input dataset.</span>
+
+<span class="sd">            :return: An ImageCollection without a time dimension.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.count_time"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.count_time">[docs]</a>    <span class="k">def</span> <span class="nf">count_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Counts the number of images with a valid mask in a time series for all bands of the input dataset.</span>
+
+<span class="sd">            :return: An ImageCollection without a time dimension.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.ndvi"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.ndvi">[docs]</a>    <span class="k">def</span> <span class="nf">ndvi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">red</span><span class="p">,</span> <span class="n">nir</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; NDVI</span>
+
+<span class="sd">            :param red: Reference to the red band</span>
+<span class="sd">            :param nir: Reference to the nir band</span>
+
+<span class="sd">            :return An ImageCollection instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.stretch_colors"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.stretch_colors">[docs]</a>    <span class="k">def</span> <span class="nf">stretch_colors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Color stretching</span>
+
+<span class="sd">            :param min: Minimum value</span>
+<span class="sd">            :param max: Maximum value</span>
+
+<span class="sd">            :return An ImageCollection instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.band_filter"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.band_filter">[docs]</a>    <span class="k">def</span> <span class="nf">band_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bands</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Filters the bands in the data cube so that bands that don&#39;t match any of the criteria are dropped from the data cube.</span>
+<span class="sd">        The data cube is expected to have only one spectral dimension.</span>
+<span class="sd">        The following criteria can be used to select bands:</span>
+
+
+<span class="sd">            :param bands: List of band names or single band name as a string. The order of the specified array defines the order of the bands in the data cube, which can be important for subsequent processes.</span>
+
+<span class="sd">            :return An ImageCollection instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.band"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.band">[docs]</a>    <span class="k">def</span> <span class="nf">band</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">band_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Select the given band, as input for subsequent operations.</span>
+
+<span class="sd">            :param bands: List of band names or single band name as a string.</span>
+
+<span class="sd">            :return An ImageCollection instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.mask"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.mask">[docs]</a>    <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">polygon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Polygon</span><span class="p">,</span> <span class="n">MultiPolygon</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">srs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span><span class="n">rastermask</span><span class="p">:</span><span class="s1">&#39;ImageCollection&#39;</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">replacement</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mask the image collection using a polygon. All pixels outside the polygon should be set to the nodata value.</span>
+<span class="sd">        All pixels inside, or intersecting the polygon should retain their original value.</span>
+
+<span class="sd">        TODO: Does mask by polygon imply cropping?</span>
+<span class="sd">        TODO: what about naming? Masking can also be done using a raster mask...</span>
+<span class="sd">        TODO: what will happen if the intersection between the mask and the imagecollection is empty? Raise an error?</span>
+
+<span class="sd">        :param polygon: A polygon, provided as a</span>
+<span class="sd">        :param srs: The reference system of the provided polygon, provided as an &#39;EPSG:XXXX&#39; string. By default this is Lat Lon (EPSG:4326).</span>
+<span class="sd">        :return: A new ImageCollection, with the mask applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.apply_kernel"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.apply_kernel">[docs]</a>    <span class="k">def</span> <span class="nf">apply_kernel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies a focal operation based on a weighted kernel to each value of the specified dimensions in the data cube.</span>
+
+<span class="sd">        :param kernel: The kernel to be applied on the data cube. The kernel has to be as many dimensions as the data cube has dimensions.</span>
+<span class="sd">        :param factor: A factor that is multiplied to each value computed by the focal operation. This is basically a shortcut for explicitly multiplying each value by a factor afterwards, which is often required for some kernel-based algorithms such as the Gaussian blur.</span>
+<span class="sd">        :return: A data cube with the newly computed values. The resolution, cardinality and the number of dimensions are the same as for the original data cube.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+    <span class="c1">####VIEW methods #######</span>
+<div class="viewcode-block" id="ImageCollection.timeseries"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">srs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract a time series for the given point location.</span>
+<span class="sd">        DEPRECATED</span>
+
+<span class="sd">        :param x: The x coordinate of the point</span>
+<span class="sd">        :param y: The y coordinate of the point</span>
+<span class="sd">        :param srs: The spatial reference system of the coordinates, by default this is &#39;EPSG:4326&#39;, where x=longitude and y=latitude.</span>
+
+<span class="sd">        :return: Dict: A timeseries</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.zonal_statistics"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.zonal_statistics">[docs]</a>    <span class="k">def</span> <span class="nf">zonal_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regions</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s2">&quot;day&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Dict&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates statistics for each zone specified in a file.</span>
+
+<span class="sd">        :param regions: GeoJSON or a path to a GeoJSON file containing the</span>
+<span class="sd">                        regions. For paths you must specify the path to a</span>
+<span class="sd">                        user-uploaded file without the user id in the path.</span>
+<span class="sd">        :param func: Statistical function to calculate for the specified</span>
+<span class="sd">                     zones. example values: min, max, mean, median, mode</span>
+<span class="sd">        :param scale: A nominal scale in meters of the projection to work</span>
+<span class="sd">                      in. Defaults to 1000.</span>
+<span class="sd">        :param interval: Interval to group the time series. Allowed values:</span>
+<span class="sd">                        day, wee, month, year. Defaults to day.</span>
+
+<span class="sd">        :return A timeseries</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.polygonal_mean_timeseries"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.polygonal_mean_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">polygonal_mean_timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polygon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Polygon</span><span class="p">,</span> <span class="n">MultiPolygon</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract a mean time series for the given (multi)polygon. Its points are expected to be in the EPSG:4326 coordinate</span>
+<span class="sd">        reference system.</span>
+
+<span class="sd">        :param polygon: The (multi)polygon; or a file path or HTTP URL to a GeoJSON file or shape file</span>
+
+<span class="sd">        :return: Dict: A timeseries</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.polygonal_histogram_timeseries"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.polygonal_histogram_timeseries">[docs]</a>    <span class="k">def</span> <span class="nf">polygonal_histogram_timeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polygon</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Polygon</span><span class="p">,</span> <span class="n">MultiPolygon</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract a histogram time series for the given (multi)polygon. Its points are expected to be in the EPSG:4326 coordinate</span>
+<span class="sd">        reference system.</span>
+
+<span class="sd">        :param polygon: The (multi)polygon; or a file path or HTTP URL to a GeoJSON file or shape file</span>
+
+<span class="sd">        :return: Dict: A timeseries</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.tiled_viewing_service"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.tiled_viewing_service">[docs]</a>    <span class="k">def</span> <span class="nf">tiled_viewing_service</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns metadata for a tiled viewing service that visualizes this layer.</span>
+
+<span class="sd">        :param type: The type of viewing service to create, for instance: &#39;WMTS&#39;</span>
+<span class="sd">        :param title: A short description to easily distinguish entities.</span>
+<span class="sd">        :param description: Detailed description to fully explain the entity. CommonMark 0.28 syntax MAY be used for rich text representation.</span>
+
+<span class="sd">        :return: A dictionary object containing the viewing service metadata, such as the connection &#39;url&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.download"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.download">[docs]</a>    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">format_options</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Extracts a binary raster from this image collection.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.send_job"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.send_job">[docs]</a>    <span class="k">def</span> <span class="nf">send_job</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Job</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Sends the current process to the backend, for batch processing.</span>
+
+<span class="sd">            :return: Job: A job object that can be used to query the processing status.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ImageCollection.graph_add_process"><a class="viewcode-back" href="../../index.html#openeo.imagecollection.ImageCollection.graph_add_process">[docs]</a>    <span class="k">def</span> <span class="nf">graph_add_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process_id</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ImageCollection&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a new imagecollection with an added process with the given process</span>
+<span class="sd">        id and a dictionary of arguments</span>
+
+<span class="sd">        :param process_id: String, Process Id of the added process.</span>
+<span class="sd">        :param args: Dict, Arguments of the process.</span>
+
+<span class="sd">        :return: imagecollection: Instance of the ImageCollection class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">openeo</a></h1>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=Open-EO&repo=openeo-python-client&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+    
+
+<p>
+<a class="badge" href="https://travis-ci.org/Open-EO/openeo-python-client">
+    <img
+        alt="https://secure.travis-ci.org/Open-EO/openeo-python-client.svg?branch=master"
+        src="https://secure.travis-ci.org/Open-EO/openeo-python-client.svg?branch=master"
+    />
+</a>
+</p>
+
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><!-- Alabaster (krTheme++) Hacks -->
+
+<!-- CSS Adjustments from requests: https://github.com/kennethreitz/requests/blob/master/docs/_templates/hacks.html-->
+<style type="text/css">
+  /* Rezzy requires precise alignment. */
+  img.logo {margin-left: -20px!important;}
+  /* "Quick Search" should be capitalized. */
+  div#searchbox h3 {text-transform: capitalize;}
+  /* Make the document a little wider, less code is cut-off. */
+  div.document {width: 1008px;}
+  /* Much-improved spacing around code blocks. */
+  div.highlight pre {padding: 11px 14px;}
+  /* Remain Responsive! */
+  @media screen and (max-width: 1008px) {
+    div.sphinxsidebar {display: none;}
+    div.document {width: 100%!important;}
+    /* Have code blocks escape the document right-margin. */
+    div.highlight pre {margin-right: -30px;}
+  }
+</style>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Jeroen Dries.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.7</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+    <a href="https://github.com/Open-EO/openeo-python-client" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>
